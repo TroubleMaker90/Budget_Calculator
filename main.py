@@ -46,8 +46,8 @@ def main_menu():
 def add_income():
     print()
     while True:
-        income_type = input('Введите тип дохода (например: зарплата, премия): ')
-        if income_type.isalpha():
+        income_type = input('Введите тип дохода (например: зарплата, премия): ').lower()
+        if income_type.strip() != '' and income_type[0].isalpha():
             break
         else:
             print('Ошибка! Введите тип дохода.')
@@ -75,8 +75,8 @@ def add_income():
 def add_expense():
     print()
     while True:
-        expense_type = input('Введите тип расхода (например: ЖКХ, налог, покупка): ')
-        if expense_type.isalpha():
+        expense_type = input('Введите тип расхода (например: ЖКХ, налог, покупка): ').lower()
+        if expense_type.strip() != '' and expense_type[0].isalpha():
             break
         else:
             print('Ошибка! Введите тип расхода.')
@@ -88,7 +88,7 @@ def add_expense():
             expense_amount = float(input('Введите сумму расхода: '))
 
             if expense_amount >= 0:
-                save_transaction(expense_type, 'Доход', expense_amount)
+                save_transaction(expense_type, 'Расход', expense_amount)
                 print('--------------')
                 print('Расход успешно записан!\nПосмотреть Расходы можно в статистике')
                 print('--------------')
@@ -102,30 +102,82 @@ def add_expense():
 
 #Отображение статистики
 def show_statistics():
-    pass
+    total_income = 0
+    total_expense = 0
+    print()
+    print('========================================================')
+    print('                Статистика транзакций')
+    print('========================================================')
+    try:
+        with open('transactions.csv', mode='r', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            first_row = next(reader, None)
+            # Проверяем, заголовок ли это (например, содержит "дата" или "тип")
+            if first_row is not None and (
+                'дата' in first_row[0].lower() or
+                'тип' in first_row[1].lower() or
+                'категория' in first_row[2].lower()
+            ):
+                # Это заголовок — пропускаем и дальше читаем
+                pass
+            else:
+                # Это не заголовок — нужно обработать эту строку тоже
+                if first_row is not None and len(first_row) == 4:
+                    date, t_type, category, amount_str = first_row
+                    try:
+                        amount = float(amount_str)
+                    except ValueError:
+                        amount = 0
+                    cat_clean = category.strip().lower()
+                    if cat_clean == 'доход':
+                        total_income += amount
+                    elif cat_clean == 'расход':
+                        total_expense += amount
+                    print(f'{date} | {t_type:<15} | {category.strip():<7} | {amount:10.2f} руб.')
+            # Читаем остальные строки
+            for row in reader:
+                if len(row) != 4:
+                    continue
+                date, t_type, category, amount_str = row
+                try:
+                    amount = float(amount_str)
+                except ValueError:
+                    continue
+                cat_clean = category.strip().lower()
+                if cat_clean == 'доход':
+                    total_income += amount
+                elif cat_clean == 'расход':
+                    total_expense += amount
+                print(f'{date} | {t_type:<15} | {category.strip():<7} | {amount:10.2f} руб.')
+    except FileNotFoundError:
+        print('Нет данных для отображения. Сначала добавьте доход или расход.')
+
+    print('---------------------------------------------')
+    print(f'Общий доход  : {total_income:10.2f} руб.')
+    print(f'Общие расходы: {total_expense:10.2f} руб.')
+    print(f'Баланс       : {(total_income - total_expense):10.2f} руб.')
+    print('=============================================')
+    question_for_user()
 
 #Запись транзакции
 def save_transaction(t_type, category, amount):
-    date_now = datetime.now().strftime('%dd-%mm-%yyyy')
+    date_now = datetime.now().strftime('%d-%m-%Y')
     with open('transactions.csv', mode='a', encoding='utf-8', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([date_now, t_type, category, amount])
-#НЕ ОСНОВНЫЕ ФУНКЦИИ
 
 #Вопрос пользователю о продолжении использования
 def question_for_user():
     while True:
         print()
         print('Желаете продолжить использовать калькулятор бюджета?')
-        answer = input('Введите "Да" или "Нет" чтобы продолжить: ')
-        answer = answer.lower()
+        answer = input('Введите "Да" или "Нет" чтобы продолжить: ').strip().lower()
         if answer == 'да':
-            main_menu()
+            return  # вернётся в вызывающую точку (меню уже внутри)
         elif answer == 'нет':
             calculator_exit()
-            break
         else:
-            print('')
+            print()
             print('ОШИБКА! Введите "Да" или "Нет" чтобы продолжить')
 
 #Выход из программы
@@ -135,5 +187,6 @@ def calculator_exit():
     print('========================================================')
     exit()
 
-#Запуск стартового меню
-main_menu()
+#Запуск главного меню
+if __name__ == '__main__':
+    main_menu()
