@@ -1,4 +1,7 @@
 import os
+import csv
+from datetime import datetime
+
 
 #Очистка консоли для удобства использования !! пока не используется
 def clear():
@@ -35,7 +38,9 @@ def main_menu():
             calculator_exit()
             break
         else:
+            print()
             print('Некорректная команда! Попробуйте снова.')
+            print()
 
 #Добавление дохода
 def add_income():
@@ -54,6 +59,7 @@ def add_income():
             income_amount = float(input('Введите сумму дохода: '))
 
             if income_amount >= 0:
+                save_transaction(income_type, 'Доход', income_amount)
                 print('--------------')
                 print('Доход успешно записан!\nПосмотреть доходы можно в статистике')
                 print('--------------')
@@ -82,6 +88,7 @@ def add_expense():
             expense_amount = float(input('Введите сумму расхода: '))
 
             if expense_amount >= 0:
+                save_transaction(expense_type, 'Доход', expense_amount)
                 print('--------------')
                 print('Расход успешно записан!\nПосмотреть Расходы можно в статистике')
                 print('--------------')
@@ -97,7 +104,12 @@ def add_expense():
 def show_statistics():
     pass
 
-
+#Запись транзакции
+def save_transaction(t_type, category, amount):
+    date_now = datetime.now().strftime('%dd-%mm-%yyyy')
+    with open('transactions.csv', mode='a', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([date_now, t_type, category, amount])
 #НЕ ОСНОВНЫЕ ФУНКЦИИ
 
 #Вопрос пользователю о продолжении использования
