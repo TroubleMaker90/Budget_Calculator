@@ -2,7 +2,6 @@ import os
 import csv
 from datetime import datetime
 
-
 #Очистка консоли для удобства использования
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
