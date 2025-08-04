@@ -3,13 +3,14 @@ import csv
 from datetime import datetime
 
 
-#Очистка консоли для удобства использования !! пока не используется
+#Очистка консоли для удобства использования
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 #Главное меню калькулятора бюджета
 def main_menu():
     while True:
+        clear()
         #Стартовое оповещение пользователя при запуске
         print('========================================================')
         print('        Добро пожаловать в калькулятор бюджета!')
@@ -44,6 +45,7 @@ def main_menu():
 
 #Добавление дохода
 def add_income():
+    clear()
     print()
     while True:
         income_type = input('Введите тип дохода (например: зарплата, премия): ').lower()
@@ -73,6 +75,7 @@ def add_income():
 
 #Добавление расхода
 def add_expense():
+    clear()
     print()
     while True:
         expense_type = input('Введите тип расхода (например: ЖКХ, налог, покупка): ').lower()
@@ -102,6 +105,7 @@ def add_expense():
 
 #Отображение статистики
 def show_statistics():
+    clear()
     total_income = 0
     total_expense = 0
     print()
@@ -182,6 +186,7 @@ def question_for_user():
 
 #Выход из программы
 def calculator_exit():
+    clear()
     print('========================================================')
     print('                  До новых встреч!')
     print('========================================================')
